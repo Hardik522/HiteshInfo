@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /private
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://hiteshrealestate.com/sitemap.xml
+
+# Allow specific bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
