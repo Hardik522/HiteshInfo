@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import person from "../../assets/images/person.png";
 import "./introduction.css";
 import InformationSummary from "./InformationSummary";
@@ -20,7 +21,8 @@ const Introduction = () => {
   }, [showBudget]);
 
   return (
-    <div className="flex max-lg:flex-col-reverse sm:justify-between pt-10 lg:pt-32 lg:mb-28 max-xl:gap-2 p-2 max-xxl:px-4" id="introduction">
+    <>
+      <div className="flex max-lg:flex-col-reverse sm:justify-between pt-10 lg:pt-32 lg:mb-28 max-xl:gap-2 p-2 max-xxl:px-4" id="introduction">
       {/* Left section */}
       <div className="w-full flex flex-col justify-between max-lg:text-center">
         <div className="pt-13 me-32 w-full lg:w-auto transition-all duration-500">
@@ -58,27 +60,148 @@ const Introduction = () => {
           alt="person"
         />
       </div>
-
-      {/* Centered Modal */}
-      {showBudget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 md:p-10 max-h-screen overflow-y-auto relative flex flex-col animate-fadeIn">
-            <button className="absolute top-4 right-4 text-gray-600 hover:text-black text-2xl font-bold" onClick={() => setShowBudget(false)}>✖</button>
-            <Budget onClose={() => setShowBudget(false)} />
-          </div>
-        </div>
-      )}
+      </div>
 
       <style>{`
         @keyframes fadeIn {
           0% { opacity: 0; transform: scale(0.95); }
           100% { opacity: 1; transform: scale(1); }
         }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s forwards;
+        
+        /* ULTIMATE MODAL STYLING - GUARANTEED TO SHOW */
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 99999;
+          background-color: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          padding: 16px;
+          box-sizing: border-box;
+          overflow: auto;
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .modal-content {
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          width: 100%;
+          max-width: 750px;
+          max-height: 93vh;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          animation: fadeIn 0.3s ease-out forwards;
+          margin: auto;
+        }
+        
+        .modal-header {
+          position: sticky;
+          top: 0;
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          padding: 14px 18px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          z-index: 100;
+          flex-shrink: 0;
+        }
+        
+        .modal-header h2 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0;
+          flex: 1;
+        }
+        
+        .modal-body {
+          padding: 10px 14px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          flex: 1;
+        }
+        
+        /* Responsive for mobile */
+        @media (max-width: 480px) {
+          .modal-overlay {
+            padding: 12px;
+          }
+          
+          .modal-content {
+            max-width: 100%;
+            max-height: 95vh;
+            border-radius: 16px;
+          }
+          
+          .modal-header {
+            padding: 16px;
+          }
+          
+          .modal-header h2 {
+            font-size: 18px;
+          }
+          
+          .modal-body {
+            padding: 16px;
+          }
+        }
+        
+        /* Responsive for tablet */
+        @media (min-width: 481px) and (max-width: 768px) {
+          .modal-content {
+            max-width: 500px;
+          }
+        }
+        
+        /* Responsive for desktop */
+        @media (min-width: 769px) {
+          .modal-content {
+            max-width: 600px;
+          }
+          
+          .modal-body {
+            padding: 32px;
+          }
         }
       `}</style>
-    </div>
+
+      {/* Modal Portal - Rendered at document body level */}
+      {showBudget && createPortal(
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {/* Header with Close Button */}
+            <div className="modal-header">
+              <h2 style={{textAlign: "center", flex: 1, margin: 0}}>Set Your Budget</h2>
+              <button 
+                className="ml-4 text-gray-400 hover:text-gray-600 transition-colors text-2xl xs:text-3xl font-light leading-none flex-shrink-0" 
+                onClick={() => setShowBudget(false)}
+                aria-label="Close modal"
+                style={{marginLeft: "16px", fontSize: "28px", background: "none", border: "none", cursor: "pointer", padding: 0}}
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Form Content */}
+            <div className="modal-body">
+              <Budget onClose={() => setShowBudget(false)} />
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 };
 
